@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Online Organizer</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.css">
+
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-messages.min.js"></script>
+
+    <!-- Angular Material Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.js"></script>
+
+
+</head>
+<body ng-app="OnlineOrganizer" ng-controller="MainController">
+
+<div class="container">
+
+    <!--Header Part-->
+    <div class="row" style="margin-top: 10px">
+        <div class="col s12 m12 l12 xl12">
+            <div class="card-panel hoverable center-align ">
+                <h3 class="indigo-text darken-4" style="margin-top: -5px">Online Organizer</h3>
+                <h5 class="indigo-text darken-3">Organize Your All Events In One Place</h5>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="input-field col xl6 m12 l6 s12 center-align card-panel hoverable" style="margin-top: -10px">
+            <h5 style="padding-top: 15px" class="indigo-text">Please Select A Date</h5>
+
+            <md-content style="margin-top: 30px" layout="column" layout-gt-xs="row"
+                        ng-cloak>
+                <div style="margin-right: 17px">
+
+                    <md-calendar ng-model="calDate"  ng-change="SelectDate()"></md-calendar>
+                </div>
+
+                <div>
+                    <md-subheader class="white-text">Dates</md-subheader>
+                    <div>
+
+                        <div>{{calDate | date:longDate}}</div>
+                    </div>
+                </div>
+            </md-content>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="col xl6 m12 l6 s12 center-align" ng-if="eventList.length > 0">
+            <div class="card-panel hoverable" style="margin-top: -10px">
+                <div class=" center-align">
+
+                    <div class="card-panel">
+                        <h5 class="indigo-text" style="margin-top: -10px">Upcoming Event</h5>
+                        <h6 class="left-align">Event Name : {{NextEventName}}</h6>
+                        <h6 class="left-align ">Event Date : {{NextEventDate}}</h6>
+                        <h6 class="left-align">Event Time : {{NextEventTime}}</h6>
+                    </div>
+
+                    <h5 class="indigo-text" style="margin-top: 30px; margin-bottom: -10px">Remaining Time</h5>
+
+                    <div class="row " style="margin-bottom: -10px">
+                        <div class="col xl-3 center-align">
+                            <h4>D</h4>
+                            <div class="card-panel hoverable">
+                                <h5>{{rDays}}</h5>
+                            </div>
+                        </div>
+
+                        <div class="col xl-3 center-align">
+                            <h4>H</h4>
+                            <div class="card-panel hoverable">
+                                <h5>{{rHours}}</h5>
+                            </div>
+                        </div>
+
+                        <div class="col xl-3 center-align">
+                            <h4>M</h4>
+                            <div class="card-panel hoverable">
+                                <h5>{{rMinutes}}</h5>
+                            </div>
+                        </div>
+
+                        <div class="col xl-3 center-align">
+                            <h4>S</h4>
+                            <div class="card-panel hoverable">
+                                <h5>{{rSeconds}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col xl6 m12 l6 s12 center-align" ng-if="eventList.length == 0">
+            <div class="card-panel hoverable" style="margin-top: -10px">
+                <h5 class="indigo-text">Feel The Free!</h5>
+                <img class="z-depth-1 hoverable" src="images/Take-Care-of-You.jpeg" style="margin-top: 10px;border-radius: 50%;width:290px;opacity: 0.8 "  height="290px">
+
+                <h6>You Have Not Any Upcoming Event</h6>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="row" ng-if="selectedDay != 'Un'" style="margin-top: -20px">
+        <div class="col xl12  m12 l12 s12">
+            <div class="card-panel hoverable center-align">
+                <h4 class="indigo-text">{{date | date:shortDate}}</h4>
+                <a ng-if="isShowAddButton()"
+                   class=" btn-floating btn-small waves-effect indigo darken-3 modal-trigger pulse tooltipped"
+                   data-position="left" data-tooltip="Add New Event" style="float: right" href="#modal1"><i
+                        class="material-icons">add</i></a>
+
+                <div class="row" ng-if="!isShowAddButton()">
+                    <h6>You Have Selected A Past Day, So You Can Not Add Event To Past!</h6>
+                </div>
+
+                <table ng-if="getSelectedDayEventCount() != 0">
+                    <thead>
+                    <tr>
+
+                        <th>Event Name</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="event in todayEventList">
+
+                        <th ng-bind="event.eventName"></th>
+                        <th ng-bind="event.eventTime">Date</th>
+                        <th>
+
+                            <a class="btn-floating btn-small waves-effect waves-light green  modal-trigger"
+                               href="#modal2" ng-click="setEditEventByEvent(event)"><i
+                                    class="material-icons">edit</i></a>
+                            <a class="btn-floating btn-small waves-effect waves-light red"
+                               ng-click="showConfirm(event.id)"><i class="material-icons">delete</i></a>
+                        </th>
+                    </tr>
+                    </tbody>
+
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Add Modal Structure -->
+<div id="modal1" class="modal" style="width: 65% !important ; height: 65% !important ;">
+
+    <div class="modal-content">
+        <h4 class="center-align blue-text" style="margin-top: 50px">Add New Event</h4>
+        <div class="left-align">
+            <form ng-submit="addEvent()">
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">event_note</i>
+                        <input  placeholder="Please Enter Event Name" id="aName" type="text" class="validate"
+                               ng-model="inEventName" >
+                        <label for="aName">Event Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">schedule</i>
+                        <input placeholder="Please Enter Event Time" id="aTime" type="text"
+                               class="timepicker validate" style="z-index: 100"
+                               ng-model="inEventTime" >
+                        <label for="aTime">Time</label>
+                    </div>
+                </div>
+                <div class="center-align" style="margin-bottom: 10px">
+                    <button class=" btn waves-effect blue modal-close" type="submit">Add Event</button>
+                    <button type="button" class=" modal-close waves-effect  red  btn">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Edit Modal Structure -->
+<div id="modal2" class="modal" style="width: 65% !important ; height: 65% !important ;">
+
+    <div class="modal-content">
+        <h4 class="center-align green-text" style="margin-top: 50px">Edit Event</h4>
+        <div class="left-align">
+            <form ng-submit="editEvent()">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">event_note</i>
+                        <input id="eName" placeholder="Enter Event Name" type="text" class="validate"
+                               ng-value="setEditEventName" ng-model="setEditEventName">
+                        <label for="eName">Event Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 xl6">
+                        <i class="material-icons prefix">date_range</i>
+                        <input id="eDate" ng-model="setEditEventDateToinput" class="validate"  placeholder="Select Event Date" type="date" >
+
+                        <label for="eDate">Date</label>
+                    </div>
+                    <div class="input-field col s12 xl6">
+                        <i class="material-icons prefix">schedule</i>
+                        <input id="eTime" type="text" placeholder="Select Event Time" class="timepicker validate"
+                               ng-model="setEditEventTime">
+                        <label for="eTime">Time</label>
+                    </div>
+                </div>
+
+
+                <div class="center-align" style="margin-bottom: 10px">
+                    <button class=" btn waves-effect green modal-close" type="submit">Edit Event</button>
+                    <button type="button" class=" modal-close waves-effect  red  btn">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="js/Style.js"></script>
+<script src="lib/angular/angular.js"></script>
+<script src="app.js"></script>
+<script src="controllers/MainController.js"></script>
+<script src="core/version/version.js"></script>
+<script src="core/version/version-directive.js"></script>
+<script src="core/version/interpolate-filter.js"></script>
+</body>
+</html>
